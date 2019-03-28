@@ -125,13 +125,13 @@ static bool isOutput(GpioMode mode){
 
 // Public member functions
 void Gpio::config(){
-    if(isValidPin(this->_pin, this->_mode)){
+    if(::isValidPin(this->_pin, this->_mode)){
         gpio_config_t cfg = {
         cfg.pin_bit_mask = 1<<this->_pin,
-        cfg.mode = getMode(this->_mode),
-        cfg.pull_up_en = getPullupEn(this->_pullup_enabled),
-        cfg.pull_down_en = getPulldownEn(this->_pulldown_enabled),
-        cfg.intr_type = getIntrType(this->_interrupt_type),
+        cfg.mode = ::getMode(this->_mode),
+        cfg.pull_up_en = ::getPullupEn(this->_pullup_enabled),
+        cfg.pull_down_en = ::getPulldownEn(this->_pulldown_enabled),
+        cfg.intr_type = ::getIntrType(this->_interrupt_type),
         };
 
         ::gpio_config(&cfg);
@@ -139,21 +139,21 @@ void Gpio::config(){
 }
 
 void Gpio::setMode(GpioMode mode){
-    if(isValidPin(this->_pin, this->_mode)){
+    if(::isValidPin(this->_pin, this->_mode)){
         this->_mode = mode;
-        ::gpio_set_direction((gpio_num_t)this->_pin, getMode(this->_mode));
+        ::gpio_set_direction((gpio_num_t)this->_pin, ::getMode(this->_mode));
     }
 }
 
 void Gpio::setOutput(GpioLevel level){
-    if(isOutput(this->_mode)){
+    if(::isOutput(this->_mode)){
         uint32_t espLevel = (level == kGpioLevelHigh) ? 1 : 0;
         ::gpio_set_level((gpio_num_t)this->_pin, espLevel);
     }
 }
 
 void Gpio::setOutputInt(int level){
-    if(isOutput(this->_mode)){
+    if(::isOutput(this->_mode)){
         uint32_t espLevel = level;
         ::gpio_set_level((gpio_num_t)this->_pin, espLevel);
     }    
