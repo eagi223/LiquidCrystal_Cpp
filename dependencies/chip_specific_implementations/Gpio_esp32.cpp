@@ -10,7 +10,8 @@
 // ESP-IDF Libraries
 #include "driver/gpio.h"
 
-// Todo: Wrap this so it doesn't get compiled in production code
+
+// Lookup tables for meaningful debug messages
 const std::string debug_mode_lookup_table[kGpioModeMax] = {
     "DISABLED",
     "INPUT",
@@ -29,7 +30,9 @@ const std::string debug_intr_loopup_table[kGpioInterruptMax] = {
     "HIGH LEVEL"
 };
 
-gpio_mode_t _getMode(GpioMode mode){
+
+// Private member functions
+static gpio_mode_t getMode(GpioMode mode){
     gpio_mode_t espGpioMode = GPIO_MODE_DISABLE;
     switch(mode){
         case kGpioModeDisabled:
@@ -63,15 +66,15 @@ gpio_mode_t _getMode(GpioMode mode){
     return espGpioMode;
 }
 
-gpio_pullup_t _getPullupEn(bool pullupEn){
+static gpio_pullup_t getPullupEn(bool pullupEn){
     return pullupEn ? GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE;
 }
 
-gpio_pulldown_t _getPulldownEn(bool pulldownEn){
+static gpio_pulldown_t getPulldownEn(bool pulldownEn){
     return pulldownEn ? GPIO_PULLDOWN_ENABLE : GPIO_PULLDOWN_DISABLE;
 }
 
-gpio_int_type_t _getIntrType(GpioInterrupt intrType){
+static gpio_int_type_t getIntrType(GpioInterrupt intrType){
     gpio_int_type_t espIntrType = GPIO_INTR_DISABLE;
     switch(intrType){
         case kGpioInterruptDisabled:
@@ -105,7 +108,7 @@ gpio_int_type_t _getIntrType(GpioInterrupt intrType){
     return espIntrType;
 }
 
-bool _isValidPin(uint8_t pin, GpioMode mode){
+static bool isValidPin(uint8_t pin, GpioMode mode){
     if( (mode == kGpioModeOutput) ||
         (mode == kGpioModeInputOutput) ||
         (mode == kGpioModeInputOutputOpenDrain)){
@@ -115,49 +118,44 @@ bool _isValidPin(uint8_t pin, GpioMode mode){
         }
 }
 
-bool _isOutput(GpioMode mode){
+static bool isOutput(GpioMode mode){
     return ((mode == kGpioModeOutput) || (mode == kGpioModeInputOutput) || (mode == kGpioModeInputOutputOpenDrain));
 }
 
+
+// Public member functions
 void Gpio::config(){
-    if(_isValidPin(this->_pin, this->_mode)){
+    if(isValidPin(this->_pin, this->_mode)){
         gpio_config_t cfg = {
         cfg.pin_bit_mask = 1<<this->_pin,
-        cfg.mode = _getMode(this->_mode),
-        cfg.pull_up_en = _getPullupEn(this->_pullup_enabled),
-        cfg.pull_down_en = _getPulldownEn(this->_pulldown_enabled),
-        cfg.intr_type = _getIntrType(this->_interrupt_type),
+        cfg.mode = getMode(this->_mode),
+        cfg.pull_up_en = getPullupEn(this->_pullup_enabled),
+        cfg.pull_down_en = getPulldownEn(this->_pulldown_enabled),
+        cfg.intr_type = getIntrType(this->_interrupt_type),
         };
 
         ::gpio_config(&cfg);
-        // print();
     }
 }
 
 void Gpio::setMode(GpioMode mode){
-    if(_isValidPin(this->_pin, this->_mode)){
-        // std::cout << "###GPIO[" << this->_pin << "] - set mode to:  " << debug_mode_lookup_table[mode] << std::endl;
+    if(isValidPin(this->_pin, this->_mode)){
         this->_mode = mode;
-        ::gpio_set_direction((gpio_num_t)this->_pin, _getMode(this->_mode));
-        // print();
+        ::gpio_set_direction((gpio_num_t)this->_pin, getMode(this->_mode));
     }
 }
 
 void Gpio::setOutput(GpioLevel level){
-    if(_isOutput(this->_mode)){
-        // std::cout << "###GPIO[" << this->_pin << "] - " << level << std::endl;
+    if(isOutput(this->_mode)){
         uint32_t espLevel = (level == kGpioLevelHigh) ? 1 : 0;
         ::gpio_set_level((gpio_num_t)this->_pin, espLevel);
-        // print();
     }
 }
 
 void Gpio::setOutputInt(int level){
-    if(_isOutput(this->_mode)){
-        // std::cout << "###GPIO[" << this->_pin << "] - " << level << std::endl;
+    if(isOutput(this->_mode)){
         uint32_t espLevel = level;
         ::gpio_set_level((gpio_num_t)this->_pin, espLevel);
-        // print();
     }    
 }
 

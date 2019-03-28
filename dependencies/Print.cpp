@@ -17,6 +17,10 @@
  Modified May 2015 by Michael C. Miller - esp8266 progmem support
  */
 
+/**
+ * Modified March 2019 by Ethan Gibson to remove the Arduino dependencies and replace with standard C/C++ ones
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <cstdarg>
@@ -74,6 +78,7 @@ size_t Print::printf(const char *format, ...) {
     return len;
 }
 
+// TODO: Evaluate to see if this is worth readding
 // size_t Print::printf_P(PGM_P format, ...) {
 //     va_list arg;
 //     va_start(arg, format);
@@ -97,6 +102,7 @@ size_t Print::printf(const char *format, ...) {
 //     return len;
 // }
 
+// TODO: Evaluate to see if this is worth readding
 // size_t Print::print(const __FlashStringHelper *ifsh) {
 //     PGM_P p = reinterpret_cast<PGM_P>(ifsh);
 
@@ -159,12 +165,14 @@ size_t Print::print(double n, int digits) {
     return printFloat(n, digits);
 }
 
+// TODO: Evaluate to see if this is worth readding
 // size_t Print::println(const __FlashStringHelper *ifsh) {
 //     size_t n = print(ifsh);
 //     n += println();
 //     return n;
 // }
 
+// TODO: Evaluate to see if this is worth readding
 // size_t Print::print(const Printable& x) {
 //     return x.printTo(*this);
 // }
@@ -227,6 +235,7 @@ size_t Print::println(double num, int digits) {
     return n;
 }
 
+// TODO: Evaluate to see if this is worth readding
 // size_t Print::println(const Printable& x) {
 //     size_t n = print(x);
 //     n += println();

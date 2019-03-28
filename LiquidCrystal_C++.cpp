@@ -1,10 +1,12 @@
 #include "LiquidCrystal_C++.hpp"
 
+// Standard C/C++ libs
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+
+// Arduino replacement libs (included in project)
 #include "Time.hpp"
-// #include "Arduino.h"
 
 // When the display powers up, it is configured as follows:
 //
@@ -21,8 +23,8 @@
 //    I/D = 1; Increment by 1 
 //    S = 0; No shift 
 //
-// Note, however, that resetting the Arduino doesn't reset the LCD, so we
-// can't assume that its in that state when a sketch starts (and the
+// Note, however, that resetting the microcontroller doesn't reset the LCD, so we
+// can't assume that its in that state when an app starts (and the
 // LiquidCrystal constructor is called).
 
 LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t rw, uint8_t enable,
@@ -42,12 +44,20 @@ LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t enable,
 LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t rw, uint8_t enable,
                  uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3)
 {
+    // Set unused pins to 255 since the is (most likely) not a valid GPIO number
+    // If using a microcontroller that does need 255 as a GPIO... this needs to change.
+    // Either increase the size of the pin parameter type (ex: uint16_t) or change to 
+    // ints and use -1 for the invalid state.
   init(1, rs, rw, enable, d0, d1, d2, d3, 0xff, 0xff, 0xff, 0xff);
 }
 
 LiquidCrystal::LiquidCrystal(uint8_t rs,  uint8_t enable,
                  uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3)
 {
+    // Set unused pins to 255 since the is (most likely) not a valid GPIO number
+    // If using a microcontroller that does need 255 as a GPIO... this needs to change.
+    // Either increase the size of the pin parameter type (ex: uint16_t) or change to 
+    // ints and use -1 for the invalid state.
   init(1, rs, 0xff, enable, d0, d1, d2, d3, 0xff, 0xff, 0xff, 0xff);
 }
 
@@ -55,11 +65,14 @@ void LiquidCrystal::init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t en
              uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
              uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7)
 {
-    // Create Gpio objects
+    // Create Gpio objects with pin specified but default settings otherwise
     _rs_pin = Gpio(rs);
     _rw_pin = Gpio(rw);
     _enable_pin = Gpio(enable);
   
+    // If a pin is 255 (meaning invalid/not-used) we create a generic Gpio object with no pin number associated.
+    // TODO: Change this to not create a Gpio object at all if a pin isn't used. Just have to make sure
+    // that no member functions here try to use Gpio methods on a _data_pins index that isn't valid
     _data_pins[0] = (d0 != 0xff) ? Gpio(d0) : Gpio(); 
     _data_pins[1] = (d1 != 0xff) ? Gpio(d1) : Gpio(); 
     _data_pins[2] = (d2 != 0xff) ? Gpio(d2) : Gpio(); 

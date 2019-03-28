@@ -1,9 +1,12 @@
 #ifndef LiquidCrystal_h
 #define LiquidCrystal_h
 
+// Standard C/C++ libs
 #include <inttypes.h>
 #include <string.h>
 #include <iostream>
+
+// Replacements for Arduino libs (included in project)
 #include "Gpio.hpp"
 #include "Print.hpp"
 
